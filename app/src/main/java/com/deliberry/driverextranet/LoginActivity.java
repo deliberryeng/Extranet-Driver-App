@@ -51,6 +51,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if (id != 0) {
             startMainActivity(id);
+            finish();
         }
 
         btn_login.setOnClickListener(new View.OnClickListener() {
@@ -151,8 +152,12 @@ public class LoginActivity extends AppCompatActivity {
 
     private void startMainActivity(int id) {
         Intent mainIntent = new Intent(this, MainActivity.class);
+
         Bundle args = new Bundle();
         args.putInt("shopperUserId", id);
+
+        mainIntent.putExtras(args);
+
         startActivity(mainIntent);
     }
 }
