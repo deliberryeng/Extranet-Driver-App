@@ -1,6 +1,8 @@
 package com.deliberry.driverextranet;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,7 +15,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.deliberry.driverextranet.utils.Consts;
@@ -21,9 +22,7 @@ import com.deliberry.driverextranet.utils.Consts;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -47,6 +46,12 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
+
+        int id = retrieveCredentials();
+
+        if (id != 0) {
+            startMainActivity(id);
+        }
 
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,7 +94,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void onLoginSuccess(int id) {
-        Toast.makeText(this, id, Toast.LENGTH_SHORT).show();
+        storeCredentials(id);
+        startMainActivity(id);
+        finish();
     }
 
     private void loginRequest(Context context, final String email, final String password) {
@@ -127,5 +134,25 @@ public class LoginActivity extends AppCompatActivity {
         params.put("password", password);
 
         return params;
+    }
+
+    private void storeCredentials(int id) {
+        SharedPreferences sharedPreferences = getSharedPreferences(Consts.SHARED_PREFERENCES_NAME, 0);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(Consts.SHARED_PREFERENCE_ID_NAME, id);
+        editor.apply();
+    }
+
+    private int retrieveCredentials() {
+        SharedPreferences sharedPreferences = this.getSharedPreferences(Consts.SHARED_PREFERENCES_NAME, 0);
+
+        return sharedPreferences.getInt(Consts.SHARED_PREFERENCE_ID_NAME, 0);
+    }
+
+    private void startMainActivity(int id) {
+        Intent mainIntent = new Intent(this, MainActivity.class);
+        Bundle args = new Bundle();
+        args.putInt("shopperUserId", id);
+        startActivity(mainIntent);
     }
 }
