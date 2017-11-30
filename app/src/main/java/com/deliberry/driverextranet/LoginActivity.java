@@ -1,5 +1,6 @@
 package com.deliberry.driverextranet;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -41,6 +42,8 @@ public class LoginActivity extends AppCompatActivity {
     @BindView(R.id.input_password)
     EditText input_password;
 
+    ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,25 +66,35 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void login(String email, String password) {
+        btn_login.setEnabled(false);
+
+        progressDialog = new ProgressDialog(LoginActivity.this,
+                R.style.Theme_AppCompat_DayNight_Dialog);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setCancelable(false);
+        progressDialog.setMessage(getText(R.string.login_progress_message));
+        progressDialog.show();
+
         if (!validate(email, password)) {
             onLoginFailed();
-        } else {
-            loginRequest(this, email, password);
+            return;
         }
+
+        loginRequest(this, email, password);
     }
 
     private boolean validate(String email, String password) {
         boolean valid = true;
 
         if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            input_email.setError("Introduce una dirección de correo válida");
+            input_email.setError(getText(R.string.login_email_error_message));
             valid = false;
         } else {
             input_email.setError(null);
         }
 
         if (password.isEmpty() || password.length() < 4 || password.length() > 10) {
-            input_password.setError("Entre 4 y 10 carácteres alfanuméricos");
+            input_password.setError(getText(R.string.login_password_error_message));
             valid = false;
         } else {
             input_password.setError(null);
@@ -91,10 +104,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void onLoginFailed() {
-        Toast.makeText(this, "Failed!", Toast.LENGTH_SHORT).show();
+        restartControls();
+        Toast.makeText(this, getText(R.string.error_message), Toast.LENGTH_SHORT).show();
     }
 
     private void onLoginSuccess(int id) {
+        restartControls();
         storeCredentials(id);
         startMainActivity(id);
         finish();
@@ -159,5 +174,10 @@ public class LoginActivity extends AppCompatActivity {
         mainIntent.putExtras(args);
 
         startActivity(mainIntent);
+    }
+
+    private void restartControls() {
+        progressDialog.dismiss();
+        btn_login.setEnabled(true);
     }
 }

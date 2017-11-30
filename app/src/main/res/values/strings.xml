@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Driver Extranet</string>
+
+    <string name="error_message">Se ha producido un error</string>
+    <string name="login_email_error_message">Introduce una dirección de correo válida</string>
+    <string name="login_password_error_message">Entre 4 y 10 carácteres alfanumericos</string>
+
+    <string name="login_progress_message">Autenticando...</string>
 </resources>
